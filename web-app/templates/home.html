@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>YouTube History Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            width: 90%;
+            max-width: 1000px;
+            padding: 2em;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            text-align: left;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .close {
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button {
+            padding: 10px;
+            background: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #e60000;
+        }
+
+        h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Welcome to the YouTube Viewer Analyzer</h1>
+        <p>Upload your YouTube watch history JSON file to find out what kind of viewer you are!</p>
+
+
+        <form action="/upload" method="post" enctype="multipart/form-data" style="margin-top: 20px;">
+            <label for="file">Choose your YouTube JSON file:</label>
+            <input type="file" id="file" name="file" accept=".json" required>
+            <button type="submit">Upload</button>
+        </form>
+        <br>
+        <br>
+        <button onclick="openModal()">&#x2139; Help</button>
+    </div>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>How To Download Your YouTube Watch History:</h2>
+            <ol>
+                <li>Go to <a href="https://takeout.google.com/settings/takeout?pli=1" target="_blank">Google
+                        Takeout</a>.</li>
+                <li>Deselect all options, then scroll down and select <b>YouTube and YouTube Music</b>.</li>
+                <li>Click on the button that says <b>Multiple Formats</b>, scroll down to <b>History</b>, and select
+                    <b>JSON</b>.</li>
+                <li>Click <b>Next step</b>, then <b>Create export</b>.</li>
+                <li>Once the export is ready, download the zip file, extract it, and upload it here!</li>
+            </ol>
+        </div>
+    </div>
+</body>
+
+<script>
+    function openModal() {
+        document.getElementById("infoModal").style.display = "block";
+    }
+    function closeModal() {
+        document.getElementById("infoModal").style.display = "none";
+    }
+</script>
+
+</html>
