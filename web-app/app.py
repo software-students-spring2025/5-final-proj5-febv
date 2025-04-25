@@ -42,7 +42,8 @@ def processWatchHistory(raw_data, chunk_size=5000):
             saveWatchHistory(clean_data)
 
 def saveWatchHistory(clean_chunk):
-    print("Chunked")
+    #save to mongodb
+    return
 
 @app.route("/")
 def home():
