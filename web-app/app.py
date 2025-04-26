@@ -7,10 +7,43 @@ from bson import ObjectId
 import os
 import requests
 import json
+import re
 
 app = Flask(__name__)
 client = MongoClient("mongodb://mongodb:27017")
 db = client["youtube_history"]
+
+def processWatchHistory(raw_data, chunk_size=5000):
+    clean_data = []
+    with open(raw_data, "r", encoding="utf-8") as f:
+        records = json.load(f)
+        for record in records:
+            if "titleUrl" not in record:
+                continue
+
+            title_url = record["titleUrl"].encode().decode('unicode_escape')
+            match = re.search(r"v=(.{11})", title_url)
+            if not match:
+                continue
+            
+            video_id = match.group(1)
+            timestamp = datetime.fromisoformat(record["time"].replace("Z", "+00:00"))
+            
+            clean_data.append({
+                "video_id": video_id,
+                "timestamp": timestamp
+            })
+            
+            if len(clean_data) >= chunk_size:
+                saveWatchHistory(clean_data)
+                clean_data = []
+                
+        if clean_data:
+            saveWatchHistory(clean_data)
+
+def saveWatchHistory(clean_chunk):
+    #save to mongodb
+    return
 
 @app.route("/")
 def home():
@@ -23,7 +56,8 @@ def upload():
     if not file or not file.filename.endswith(".json"):
         return {"error": "Please upload a JSON file."}, 400
 
-    history = json.load(file)
+    history = processWatchHistory(file)
+    
     data = {
         "Timestamp": datetime.now(), 
         "raw_data": history, 
@@ -49,4 +83,5 @@ def results(id):
 
 # main driver function
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5002, debug=True)
+    processWatchHistory("watch-history.json")
+    #app.run(host="0.0.0.0", port=5002, debug=True)
