@@ -83,5 +83,5 @@ def results(id):
 
 # main driver function
 if __name__ == "__main__":
-    processWatchHistory("watch-history.json")
-    #app.run(host="0.0.0.0", port=5002, debug=True)
+    # processWatchHistory("watch-history.json")
+    app.run(host="0.0.0.0", port=5002, debug=True)
