@@ -125,15 +125,15 @@ def logOutput():
     print("Total Videos: ", metrics["total_videos"])
     print("Hourly Watchtime: ", metrics["hourly_watchtime"])
     print("\nTag Frequency: ")
-    sorted_tags = sorted(metrics["tag_frequency"].items(), key=lambda x: x[1], reverse=True)[:10]
+    sorted_tags = sorted(metrics["tag_frequency"].items(), key=lambda x: x[1], reverse=True)[:100]
     for tag, freq in sorted_tags:
         print(f"{tag}: {freq}")
     print("\nChannel Stats: ")
-    sorted_channels = sorted(metrics["channel_stats"].items(), key=lambda x: x[1]["frequency"], reverse=True)[:10]
+    sorted_channels = sorted(metrics["channel_stats"].items(), key=lambda x: x[1]["frequency"], reverse=True)[:100]
     for channel, freq in sorted_channels:
         print(f"{channel}: {freq}")
     print("\nCategory Stats: ")
-    sorted_categories = sorted(metrics["category_stats"].items(), key=lambda x: x[1]["frequency"], reverse=True)[:10]
+    sorted_categories = sorted(metrics["category_stats"].items(), key=lambda x: x[1]["frequency"], reverse=True)[:100]
     for category, freq in sorted_categories:
         print(f"{category}: {freq}")
     print("\nLongest Video: ", '"', metrics["longest_video"]["video_id"], '" ', '"', metrics["longest_video"]["duration"], '"')
