@@ -30,38 +30,40 @@ metrics = {
 def processWatchHistory(raw_data, chunk_size=5000, limit=1000):
     clean_data = []
     video_count = 0
-    with open(raw_data, "r", encoding="utf-8") as f:
-        records = json.load(f)
-        for record in records:
-            if video_count >= limit:
-                break
-            
-            if "titleUrl" not in record:
-                continue
+    # Handle FileStorage object from Flask
+    records = json.loads(raw_data.read().decode('utf-8'))
+    for record in records:
+        if video_count >= limit:
+            break
+        
+        if "titleUrl" not in record:
+            continue
 
-            title_url = record["titleUrl"].encode().decode('unicode_escape')
-            match = re.search(r"v=(.{11})", title_url)
-            if not match:
-                continue
-            
-            video_id = match.group(1)
-            timestamp = datetime.fromisoformat(record["time"].replace("Z", "+00:00"))
-            
-            clean_data.append({
-                "video_id": video_id,
-                "timestamp": timestamp
-            })
-            
-            video_count += 1
-            
-            if len(clean_data) >= chunk_size:
-                enrichData(clean_data)
-                logOutput()
-                clean_data = []
-                
-        if clean_data:
+        title_url = record["titleUrl"].encode().decode('unicode_escape')
+        match = re.search(r"v=(.{11})", title_url)
+        if not match:
+            continue
+        
+        video_id = match.group(1)
+        timestamp = datetime.fromisoformat(record["time"].replace("Z", "+00:00"))
+        
+        clean_data.append({
+            "video_id": video_id,
+            "timestamp": timestamp
+        })
+        
+        video_count += 1
+        
+        if len(clean_data) >= chunk_size:
             enrichData(clean_data)
             logOutput()
+            clean_data = []
+            
+    if clean_data:
+        enrichData(clean_data)
+        logOutput()
+    
+    return records  # Return the parsed JSON data instead of raw string
 
 def saveWatchHistory(clean_chunk, last_chunk=False):
     #save to mongodb
@@ -90,6 +92,9 @@ def enrichData(clean_chunk):
             }
             response = requests.get("https://www.googleapis.com/youtube/v3/videos", params=params)
             enriched_video_data = response.json()
+
+            if "items" not in enriched_video_data:
+                continue
             
             for enriched_video in enriched_video_data["items"]:
                 # temp datastore for easy access
@@ -146,12 +151,12 @@ def home():
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    file = request.files.get("file")
+    file = request.files["file"]
     if not file or not file.filename.endswith(".json"):
         return {"error": "Please upload a JSON file."}, 400
 
     history = processWatchHistory(file)
-    
+
     data = {
         "Timestamp": datetime.now(), 
         "raw_data": history, 
@@ -160,7 +165,7 @@ def upload():
 
     inserted = db.Request.insert_one(data)
 
-    analysis_url = os.getenv("OPENAI_API_KEY", "http://open-ai:8000")
+    analysis_url = os.getenv("OPENAI_SERVICE_URL", "http://open-ai:8000")
     requests.post(f"{analysis_url}/analyze", json={"id": str(inserted.inserted_id)})
 
     return redirect(url_for("results", id=str(inserted.inserted_id)))

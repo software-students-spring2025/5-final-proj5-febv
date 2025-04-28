@@ -1,61 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>YouTube History Analyzer</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: white;
+                margin: 0;
+                height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
 
-<head>
-    <meta charset="UTF-8">
-    <title>YouTube History Analyzer</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: white;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+            .container {
+                background: white;
+                width: 90%;
+                max-width: 1000px;
+                padding: 2em;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                text-align: center;
+            }
 
-        .container {
-            background: white;
-            width: 90%;
-            max-width: 1000px;
-            padding: 2em;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
+            button {
+                padding: 10px;
+                background: #ff0000;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 1em;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
 
-        button {
-            padding: 10px;
-            background: #ff0000;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
+            button:hover {
+                background: #e60000;
+            }
+        </style>
+    </head>
 
-        button:hover {
-            background: #e60000;
-        }
-    </style>
-</head>
+    <body>
+        <div class="container">
+            <h1>Your YouTube Viewer Analysis</h1>
 
-<body>
-    <div class="container">
-        <h1>Your YouTube Viewer Analysis</h1>
+            {% if analysis and analysis.summary %}
+            <div class="summary">
+                <p>{{ analysis.summary }}</p>
+            </div>
+            {% else %}
+            <p>{{ analysis }}</p>
+            {% endif %}
 
-        {% if analysis and analysis.summary %}
-        <div class="summary">
-            <p>{{ analysis.summary }}</p>
+            <a class="back-link" href="/">&#x2190; Back to Home</a>
         </div>
-        {% else %}
-        <p>No analysis available.</p>
-        {% endif %}
-
-        <a class="back-link" href="/">&#x2190; Back to Home</a>
-    </div>
-</body>
-
+    </body>
 </html>

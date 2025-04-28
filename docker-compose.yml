@@ -1,36 +1,37 @@
 services:
-  web: 
-    build: ./web-app
-    ports:
-      - "5002:5002"
-    depends_on:
-      - mongodb
-      - open-ai
-    environment:
-      - FLASK_ENV=development
-    volumes:
-      - ./web-app:/app
+    web:
+        build: ./web-app
+        ports:
+            - "5002:5002"
+        depends_on:
+            - mongodb
+            - open-ai
+        environment:
+            - FLASK_ENV=development
+            - OPENAI_SERVICE_URL=http://open-ai:8000
+        volumes:
+            - ./web-app:/app
 
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
+    mongodb:
+        image: mongo
+        container_name: mongodb
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongo-data:/data/db
 
-  open-ai:
-    build:
-      context: ./open-ai
-    ports:
-      - "8000:8000"
-    container_name: open-ai
-    depends_on:
-      - mongodb
-    env_file:
-      - .env
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017
+    open-ai:
+        build:
+            context: ./open-ai
+        ports:
+            - "8000:8000"
+        container_name: open-ai
+        depends_on:
+            - mongodb
+        env_file:
+            - .env
+        environment:
+            - MONGO_URI=mongodb://mongodb:27017
 
 volumes:
-  mongo-data:
+    mongo-data:
