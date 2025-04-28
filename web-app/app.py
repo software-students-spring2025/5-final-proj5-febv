@@ -30,38 +30,42 @@ metrics = {
 def processWatchHistory(raw_data, chunk_size=5000, limit=1000):
     clean_data = []
     video_count = 0
-    with open(raw_data, "r", encoding="utf-8") as f:
-        records = json.load(f)
-        for record in records:
-            if video_count >= limit:
-                break
-            
-            if "titleUrl" not in record:
-                continue
+    #with open(raw_data, "r", encoding="utf-8") as f:
+    records = json.load(raw_data)
+    for record in records:
+        if video_count >= limit:
+            break
+        
+        if "titleUrl" not in record:
+            continue
 
-            title_url = record["titleUrl"].encode().decode('unicode_escape')
-            match = re.search(r"v=(.{11})", title_url)
-            if not match:
-                continue
-            
-            video_id = match.group(1)
-            timestamp = datetime.fromisoformat(record["time"].replace("Z", "+00:00"))
-            
-            clean_data.append({
-                "video_id": video_id,
-                "timestamp": timestamp
-            })
-            
-            video_count += 1
-            
-            if len(clean_data) >= chunk_size:
-                enrichData(clean_data)
-                logOutput()
-                clean_data = []
-                
-        if clean_data:
+        title_url = record["titleUrl"].encode().decode('unicode_escape')
+        match = re.search(r"v=(.{11})", title_url)
+        if not match:
+            continue
+        
+        video_id = match.group(1)
+        timestamp = datetime.fromisoformat(record["time"].replace("Z", "+00:00"))
+        title = record.get("title", "Unknown Title")
+
+        clean_data.append({
+            "video_id": video_id,
+            "timestamp": timestamp, 
+            "title": title
+        })
+        
+        video_count += 1
+        
+        if len(clean_data) >= chunk_size:
             enrichData(clean_data)
             logOutput()
+            clean_data = []
+            
+    if clean_data:
+        enrichData(clean_data)
+        logOutput()
+
+    return clean_data
 
 def saveWatchHistory(clean_chunk, last_chunk=False):
     #save to mongodb
@@ -160,8 +164,11 @@ def upload():
 
     inserted = db.Request.insert_one(data)
 
-    analysis_url = os.getenv("OPENAI_API_KEY", "http://open-ai:8000")
-    requests.post(f"{analysis_url}/analyze", json={"id": str(inserted.inserted_id)})
+    try:
+        requests.post("http://open-ai:8000/summarize", json={"id": str(inserted.inserted_id)})
+        response.raise_for_status()
+    except Exception as e:
+        print(f"Error posting to open-ai: {e}")
 
     return redirect(url_for("results", id=str(inserted.inserted_id)))
 
@@ -173,7 +180,7 @@ def results(id):
     if not data.get("analysis"):
         return render_template("loading.html", id=id)
 
-    return render_template("results.html", analysis=data["analysis"], id=id)
+    return render_template("results.html", analysis=data["analysis"], metrics=metrics, id=id)
 
 # main driver function
 if __name__ == "__main__":

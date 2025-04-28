@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 flask = "*"
 requests = "*"
+pymongo = "*"
+dotenv = "*"
+isodate = "*"
 
 [dev-packages]
 

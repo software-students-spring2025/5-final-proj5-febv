@@ -9,50 +9,62 @@
             font-family: Arial, sans-serif;
             background: white;
             margin: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 2em;
         }
 
         .container {
-            background: white;
-            width: 90%;
             max-width: 1000px;
-            padding: 2em;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+
+        h1, h2 {
+            color: #d9230f;
+        }
+
+        .metrics, .summary {
+            margin-bottom: 2em;
+        }
+
+        ul {
+            padding-left: 1.5em;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 2em;
             text-align: center;
-        }
-
-        button {
-            padding: 10px;
-            background: #ff0000;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        button:hover {
-            background: #e60000;
+            text-decoration: none;
+            color: #d9230f;
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Your YouTube Viewer Analysis</h1>
+        <h1>Your YouTube Watch Analysis</h1>
 
-        {% if analysis and analysis.summary %}
-        <div class="summary">
-            <p>{{ analysis.summary }}</p>
+        <div class="metrics">
+            <h2>Watch Metrics</h2>
+            <ul>
+                <li><strong>Total Watch Time:</strong> {{ metrics.total_watchtime | round(2) }} seconds</li>
+                <li><strong>Total Videos Watched:</strong> {{ metrics.total_videos }}</li>
+                <li><strong>Most Watched Channel:</strong> 
+                    {% if metrics.channel_stats %}
+                        {{ metrics.channel_stats | dictsort(false, 'value')['0'][0] }}
+                    {% else %}
+                        No data
+                    {% endif %}
+                </li>
+                <li><strong>Longest Video Watched:</strong> {{ metrics.longest_video.video_id }} ({{ metrics.longest_video.duration | round(2) }} seconds)</li>
+                <li><strong>Shortest Video Watched:</strong> {{ metrics.shortest_video.video_id }} ({{ metrics.shortest_video.duration | round(2) }} seconds)</li>
+            </ul>
         </div>
-        {% else %}
-        <p>No analysis available.</p>
-        {% endif %}
+
+        <div class="summary">
+            <h2>OpenAI Summary</h2>
+            <p>{{ analysis }}</p>
+        </div>
 
         <a class="back-link" href="/">&#x2190; Back to Home</a>
     </div>
