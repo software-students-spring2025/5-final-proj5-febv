@@ -32,10 +32,11 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Push Docker image to Docker Hub
+            - name: Build and push Docker image
               run: |
                   echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-                  docker tag open-ai_openai ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest
+                  docker compose build open-ai
+                  docker tag 5-final-proj5-febv-open-ai ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest
                   docker push ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest
 
             - name: Deploy to Droplet

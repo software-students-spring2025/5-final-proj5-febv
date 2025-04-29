@@ -33,9 +33,10 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Push Docker image to Docker Hub
+            - name: Build and push Docker image
               run: |
                   echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+                  docker compose build web
                   docker tag 5-final-proj5-febv-web ${{ secrets.DOCKERHUB_USERNAME }}/web-app:latest
                   docker push ${{ secrets.DOCKERHUB_USERNAME }}/web-app:latest
 
