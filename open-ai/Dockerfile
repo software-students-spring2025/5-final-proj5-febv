@@ -12,8 +12,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy Pipfile and Pipfile.lock first to leverage Docker cache
 COPY Pipfile Pipfile.lock* ./
 
-# Install dependencies
+# Install dependencies using pipenv
 RUN pipenv install --deploy --system
+
+# Copy requirements.txt and install dependencies using pip as a backup
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 # Copy the rest of the application
 COPY . .
