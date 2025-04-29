@@ -99,8 +99,9 @@ jobs:
                           mongo-data:
                       EOL
 
-                      # Stop and remove existing containers
-                      docker compose down
+                      # Stop and remove only open-ai related containers
+                      docker stop open-ai || true
+                      docker rm -f open-ai || true
 
                       # Pull the latest open-ai image
                       docker pull ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest

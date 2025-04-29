@@ -108,8 +108,9 @@ jobs:
                           mongo-data:
                       EOL
 
-                      # Stop and remove existing containers
-                      docker compose down
+                      # Stop and remove only web-app related containers
+                      docker stop web || true
+                      docker rm -f web || true
 
                       # Pull the latest web-app image
                       docker pull ${{ secrets.DOCKERHUB_USERNAME }}/web-app:latest
