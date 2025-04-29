@@ -2,7 +2,7 @@ name: Open AI Subsystem CI/CD
 on:
     pull_request:
     push:
-        branches: [main]
+        branches: [main, fix-ci-cd]
 
 jobs:
     test-open-ai:
@@ -27,7 +27,7 @@ jobs:
 
     deploy:
         needs: test-open-ai
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         runs-on: ubuntu-latest
         timeout-minutes: 15
         steps:
@@ -58,6 +58,46 @@ jobs:
                       # Create .env file
                       echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
                       echo "MONGO_URI=mongodb://mongodb:27017" >> .env
+
+                      # Copy docker-compose.yml
+                      cat > docker-compose.yml << 'EOL'
+                      services:
+                          web:
+                              image: ${{ secrets.DOCKERHUB_USERNAME }}/web-app:latest
+                              ports:
+                                  - "5002:5002"
+                              depends_on:
+                                  - mongodb
+                                  - open-ai
+                              env_file:
+                                  - .env
+                              environment:
+                                  - FLASK_ENV=development
+                                  - OPENAI_SERVICE_URL=http://open-ai:8000
+
+                          mongodb:
+                              image: mongo
+                              container_name: mongodb
+                              ports:
+                                  - "27017:27017"
+                              volumes:
+                                  - mongo-data:/data/db
+
+                          open-ai:
+                              image: ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest
+                              ports:
+                                  - "8000:8000"
+                              container_name: open-ai
+                              depends_on:
+                                  - mongodb
+                              env_file:
+                                  - .env
+                              environment:
+                                  - MONGO_URI=mongodb://mongodb:27017
+
+                      volumes:
+                          mongo-data:
+                      EOL
 
                       # Stop and remove existing containers
                       docker compose down
