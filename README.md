@@ -9,7 +9,7 @@ This project allows users to upload their YouTube watch history and recieved a s
 ## Team Members:
 - [Forrest Williams](https://github.com/Zeklin)
 - [Vladimir Kartamyshev](https://github.com/lawaldemur)
-- [Brian](https://github.com/brian105)
+- [Brian Tylo](https://github.com/brian105)
 - [Emily Ney](https://github.com/EmilyNey)
 
 ## How to Run This Project:
