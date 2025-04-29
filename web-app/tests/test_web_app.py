@@ -9,7 +9,7 @@ import pytest
 from app import processWatchHistory, metrics, logOutput
 
 @patch("app.requests.get")
-def test_processWatchHistory_parses_and_enriches(mock_get):
+def test_processWatchHistory_and_enricheData(mock_get):
     mock_get.return_value.status_code = 200
     mock_get.return_value.json.return_value = {
         "items": [{
@@ -39,7 +39,7 @@ def test_processWatchHistory_parses_and_enriches(mock_get):
     assert metrics["channel_stats"]["Test Channel"]["frequency"] == 2
     assert "test" in metrics["tag_frequency"]
 
-def test_log_output_prints(capsys):
+def test_log_output(capsys):
     logOutput()
     captured = capsys.readouterr()
     assert "Total Watchtime:" in captured.out
