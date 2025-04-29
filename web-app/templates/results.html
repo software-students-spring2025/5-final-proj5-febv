@@ -13,30 +13,37 @@
                 align-items: center;
                 justify-content: center;
             }
-
+    
             .container {
                 background: white;
                 width: 90%;
                 max-width: 1000px;
                 padding: 2em;
                 border-radius: 10px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
                 text-align: center;
             }
-
-            button {
-                padding: 10px;
-                background: #ff0000;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 1em;
-                cursor: pointer;
-                transition: background 0.3s ease;
+    
+            h2 {
+                color: #d9230f;
             }
-
-            button:hover {
-                background: #e60000;
+    
+            .metrics,
+            .summary {
+                margin-bottom: 2em;
+            }
+    
+            ul {
+                padding-left: 1.5em;
+            }
+    
+            .back-link {
+                display: block;
+                margin-top: 2em;
+                text-align: center;
+                text-decoration: none;
+                color: #d9230f;
+                font-weight: bold;
             }
         </style>
     </head>
@@ -45,9 +52,35 @@
         <div class="container">
             <h1>Your YouTube Viewer Analysis</h1>
 
-            {% if analysis and analysis.summary %}
+            {% if analysis and analysis.habits.summary %}
             <div class="summary">
-                <p>{{ analysis.summary }}</p>
+                <h2>Insights</h2>
+                <p><strong>Summary: </strong>{{ analysis.habits.summary }}</p>
+                <p><strong>Recommendations: </strong>
+                    {% for recommendation in analysis.habits.recommendations %}
+                        {{ recommendation }}{% if not loop.last %} {% endif %}
+                    {% endfor %}
+                </p>
+                <h2>Metrics</h2>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); font-weight: bold; margin-bottom: 0.5rem;">
+                    <div>Top Channels</div>
+                    <div>Top Categories</div>
+                </div>
+
+                {% for i in range(5) %}
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); margin-bottom: 0.25rem;">
+                    <div>
+                        {% if analysis.channels.most_frequent|length > i %}
+                            {{ analysis.channels.most_frequent[i] }} ({{ analysis.channels.watch_time[analysis.channels.most_frequent[i]] }} videos)
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if analysis.categories.most_watched|length > i %}
+                            {{ analysis.categories.most_watched[i] }} ({{ analysis.categories.watch_time[analysis.categories.most_watched[i]] }} videos)
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
             </div>
             {% else %}
             <p>{{ analysis }}</p>
