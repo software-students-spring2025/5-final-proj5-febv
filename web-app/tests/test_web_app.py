@@ -6,6 +6,44 @@ from bson.errors import InvalidId
 from unittest.mock import patch
 import json
 import pytest
+from app import processWatchHistory, metrics, logOutput
+
+@patch("app.requests.get")
+def test_processWatchHistory_and_enricheData(mock_get):
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.json.return_value = {
+        "items": [{
+            "id": "abc123def45",
+            "contentDetails": {"duration": "PT4M20S"},
+            "snippet": {
+                "title": "Test Video",
+                "channelTitle": "Test Channel",
+                "categoryId": "22",
+                "tags": ["test", "demo"]
+            }
+        }]
+    }
+
+    mock_data = []
+    for _ in range(52):
+        mock_data.append({
+            "title": "Watched Test Video",
+            "time": "2023-10-01T12:00:00Z",
+            "titleUrl": "https://www.youtube.com/watch?v=abc123def45"
+        })
+    file_obj = io.BytesIO(json.dumps(mock_data).encode("utf-8"))
+    result = processWatchHistory(file_obj)
+
+    assert result is not None
+    assert metrics["total_watchtime"] > 0
+    assert metrics["channel_stats"]["Test Channel"]["frequency"] == 2
+    assert "test" in metrics["tag_frequency"]
+
+def test_log_output(capsys):
+    logOutput()
+    captured = capsys.readouterr()
+    assert "Total Watchtime:" in captured.out
+
 
 def test_home_page(client):
     response = client.get("/")
