@@ -177,6 +177,7 @@ def results(id):
         return {"error": "Couldn't generate results. Try again."}, 400
     if not data.get("analysis"):
         return render_template("loading.html", id=id)
+        raw_analysis = data.get("analysis")
 
     return render_template("results.html", analysis=data["analysis"], id=id)
 
