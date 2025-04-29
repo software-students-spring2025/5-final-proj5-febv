@@ -10,6 +10,7 @@ openai = "*"
 python-dotenv = "*"
 
 [dev-packages]
+pytest = ">=8.3.5"
 
 [requires]
 python_version = "3.9"
