@@ -219,6 +219,53 @@ def results(id):
     
     return render_template("results.html", analysis=json.loads(data["analysis"]), id=id)
 
+@app.route("/example-results")
+def example_results():
+    example_analysis = {
+        "categories": {
+            "most_watched": [
+                "Sports",
+                "Technology",
+                "Comedy",
+                "Gaming",
+                "Education"
+            ],
+            "watch_time": {
+                "Sports": 15,
+                "Technology": 8,
+                "Comedy": 6,
+                "Gaming": 4,
+                "Education": 5
+            }
+        },
+        "channels": {
+            "most_frequent": [
+                "Bill Simmons",
+                "Mortdog - TFT",
+                "AFunkyDiabetic",
+                "Linus Tech Tips",
+                "Game Changer Shorts"
+            ],
+            "watch_time": {
+                "Bill Simmons": 20,
+                "Mortdog - TFT": 10,
+                "AFunkyDiabetic": 12,
+                "Linus Tech Tips": 10,
+                "Game Changer Shorts": 15
+            }
+        },
+        "habits": {
+            "summary": "The user has a diverse range of interests, primarily focused on sports commentary, technology updates, and comedic shorts. Viewing peaks in the evening, particularly on weekdays, indicating a preference for entertainment after work or school hours.",
+            "recommendations": [
+                "Explore more channels in the technology space for the latest trends.",
+                "Consider following more educational content to enhance knowledge in areas of interest.",
+                "Engage with live sports commentary or analysis for real-time insights."
+            ]
+        }
+    }
+
+    return render_template("results.html", analysis=example_analysis, id=None)
+
 # main driver function
 if __name__ == "__main__":
     # processWatchHistory("watch-history.json")
