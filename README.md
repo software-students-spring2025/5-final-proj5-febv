@@ -6,7 +6,7 @@
 This project allows users to upload their YouTube watch history and recieved a synthesized analysis of their viewing habits. 
 
 ## Deployed App
-Checkout the [deployed app](http://45.55.231.88:5002/).
+Check out the [deployed app](http://45.55.231.88:5002/).
 
 ## Container Images
 - Web-App Docker Image
