@@ -2,7 +2,7 @@ name: Open AI Subsystem CI/CD
 on:
     pull_request:
     push:
-        branches: [main, fix-ci-cd]
+        branches: [main]
 
 jobs:
     test-open-ai:
@@ -27,7 +27,7 @@ jobs:
 
     deploy:
         needs: test-open-ai
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         runs-on: ubuntu-latest
         timeout-minutes: 15
         steps:
