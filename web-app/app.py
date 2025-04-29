@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
+from copy import deepcopy
 from collections import defaultdict
 from config import YOUTUBE_API_KEY
 import os
@@ -17,17 +18,17 @@ client = MongoClient("mongodb://mongodb:27017")
 db = client["youtube_history"]
 
 metrics = {
-    "total_watchtime": 0,
-    "total_videos": 0,
-    "hourly_watchtime": {},
-    "tag_frequency": {},
-    "channel_stats": defaultdict(lambda: {"watchtime": 0, "frequency": 0}),
-    "category_stats": defaultdict(lambda: {"watchtime": 0, "frequency": 0}),
-    "longest_video": {"video_id": "", "duration": 0},
-    "shortest_video": {"video_id": "", "duration": float("inf")},
-}
+        "total_watchtime": 0,
+        "total_videos": 0,
+        "hourly_watchtime": {},
+        "tag_frequency": {},
+        "channel_stats": defaultdict(lambda: {"watchtime": 0, "frequency": 0}),
+        "category_stats": defaultdict(lambda: {"watchtime": 0, "frequency": 0}),
+        "longest_video": {"video_id": "", "duration": 0},
+        "shortest_video": {"video_id": "", "duration": float("inf")}
+    }
 
-def processWatchHistory(raw_data, chunk_size=5000, limit=1000):
+def processWatchHistory(raw_data, chunk_size=5000, limit=1000): 
     clean_data = []
     video_count = 0
     # Handle FileStorage object from Flask
@@ -56,12 +57,10 @@ def processWatchHistory(raw_data, chunk_size=5000, limit=1000):
         
         if len(clean_data) >= chunk_size:
             enrichData(clean_data)
-            logOutput()
             clean_data = []
             
     if clean_data:
         enrichData(clean_data)
-        logOutput()
     
     return records  # Return the parsed JSON data instead of raw string
 
@@ -122,7 +121,47 @@ def enrichData(clean_chunk):
                     metrics["shortest_video"]["video_id"] = enriched_video["id"]
                     metrics["shortest_video"]["duration"] = temp_duration
             subchunk = []
-    # TODO still need to process last subchunk
+    if subchunk:
+        api_ids = ",".join(subchunk)
+        # api call
+        params = {
+            "key": YOUTUBE_API_KEY,
+            "part": "snippet,contentDetails,statistics",
+            "fields": "items(id,snippet(title,channelTitle,categoryId,tags,publishedAt),contentDetails(duration))",
+            "id": api_ids,
+        }
+        response = requests.get("https://www.googleapis.com/youtube/v3/videos", params=params)
+        enriched_video_data = response.json()
+
+        if "items" not in enriched_video_data:
+            return
+        
+        for enriched_video in enriched_video_data["items"]:
+            # temp datastore for easy access
+            temp_duration = isodate.parse_duration(enriched_video["contentDetails"]["duration"]).total_seconds()
+            # 6 hour cap
+            if temp_duration > 21600:
+                continue
+            temp_tags = enriched_video["snippet"].get("tags", [])
+            temp_channel = enriched_video["snippet"].get("channelTitle", "UnknownChannel")
+            temp_category = enriched_video["snippet"].get("categoryId", "UnknownCategory")
+            
+            # metrics update
+            metrics["total_watchtime"] += temp_duration
+            metrics["total_videos"] += 1
+            for tag in temp_tags:
+                metrics["tag_frequency"][tag] = metrics["tag_frequency"].get(tag, 0) + 1
+            metrics["channel_stats"][temp_channel]["watchtime"] += temp_duration
+            metrics["channel_stats"][temp_channel]["frequency"] += 1
+            metrics["category_stats"][temp_category]["watchtime"] += temp_duration
+            metrics["category_stats"][temp_category]["frequency"] += 1
+            if temp_duration > metrics["longest_video"]["duration"]:
+                metrics["longest_video"]["video_id"] = enriched_video["id"]
+                metrics["longest_video"]["duration"] = temp_duration
+            if temp_duration < metrics["shortest_video"]["duration"]:
+                metrics["shortest_video"]["video_id"] = enriched_video["id"]
+                metrics["shortest_video"]["duration"] = temp_duration
+        subchunk = []
     return
 
 def logOutput():
@@ -177,8 +216,8 @@ def results(id):
         return {"error": "Couldn't generate results. Try again."}, 400
     if not data.get("analysis"):
         return render_template("loading.html", id=id)
-
-    return render_template("results.html", analysis=data["analysis"], id=id)
+    
+    return render_template("results.html", analysis=json.loads(data["analysis"]), id=id)
 
 # main driver function
 if __name__ == "__main__":
