@@ -1,4 +1,4 @@
-name: Web App CI
+name: Web App Subsystem CI/CD
 on:
     pull_request:
     push:
