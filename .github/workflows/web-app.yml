@@ -35,7 +35,7 @@ jobs:
 
             - name: Push Docker image to Docker Hub
               run: |
-                  docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+                  echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
                   docker tag 5-final-proj5-febv-web ${{ secrets.DOCKERHUB_USERNAME }}/web-app:latest
                   docker push ${{ secrets.DOCKERHUB_USERNAME }}/web-app:latest
 
@@ -46,17 +46,17 @@ jobs:
                   username: root
                   password: ${{ secrets.DROPLET_PASSWORD }}
                   script: |
-                      # Navigate to project directory
-                      cd /home/swe/5-final-proj5-febv
-
-                      # Pull latest code
-                      git pull origin main
+                      # Login to Docker Hub
+                      echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
                       # Stop and remove existing containers
                       docker compose down
 
-                      # Build and start new containers
-                      docker compose up -d --build
+                      # Pull the latest web-app image
+                      docker pull ${{ secrets.DOCKERHUB_USERNAME }}/web-app:latest
+
+                      # Start the containers
+                      docker compose up -d
 
                       # Clean up unused images
                       docker image prune -f
