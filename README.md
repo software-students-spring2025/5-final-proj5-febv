@@ -9,8 +9,8 @@ This project allows users to upload their YouTube watch history and recieved a s
 Check out the [deployed app](http://45.55.231.88:5002/).
 
 ## Container Images
-- Web-App Docker Image
-- Open-AI Docker Image
+- [Web-App Docker Image](https://hub.docker.com/r/emney/web-app)
+- [Open-AI Docker Image](https://hub.docker.com/r/emney/open-ai)
 
 ## Team Members:
 - [Forrest Williams](https://github.com/Zeklin)
