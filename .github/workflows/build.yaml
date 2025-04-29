@@ -16,10 +16,10 @@ jobs:
 
             - name: Build and test with Docker Compose
               run: |
-                  docker compose -f docker-compose.test.yml build
-                  docker compose -f docker-compose.test.yml up -d
-                  docker compose -f docker-compose.test.yml exec -T web pytest
-                  docker compose -f docker-compose.test.yml down
+                  docker compose build
+                  docker compose up -d
+                  docker compose -T web pytest
+                  docker compose down
 
     deploy:
         needs: test
