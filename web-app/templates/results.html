@@ -9,19 +9,28 @@
             font-family: Arial, sans-serif;
             background: white;
             margin: 0;
-            padding: 2em;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
+            background: white;
+            width: 90%;
             max-width: 1000px;
-            margin: auto;
+            padding: 2em;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
         }
 
-        h1, h2 {
+        h2 {
             color: #d9230f;
         }
 
-        .metrics, .summary {
+        .metrics,
+        .summary {
             margin-bottom: 2em;
         }
 
@@ -44,27 +53,19 @@
     <div class="container">
         <h1>Your YouTube Watch Analysis</h1>
 
-        <div class="metrics">
-            <h2>Watch Metrics</h2>
-            <ul>
-                <li><strong>Total Watch Time:</strong> {{ metrics.total_watchtime | round(2) }} seconds</li>
-                <li><strong>Total Videos Watched:</strong> {{ metrics.total_videos }}</li>
-                <li><strong>Most Watched Channel:</strong> 
-                    {% if metrics.channel_stats %}
-                        {{ metrics.channel_stats | dictsort(false, 'value')['0'][0] }}
-                    {% else %}
-                        No data
-                    {% endif %}
-                </li>
-                <li><strong>Longest Video Watched:</strong> {{ metrics.longest_video.video_id }} ({{ metrics.longest_video.duration | round(2) }} seconds)</li>
-                <li><strong>Shortest Video Watched:</strong> {{ metrics.shortest_video.video_id }} ({{ metrics.shortest_video.duration | round(2) }} seconds)</li>
-            </ul>
-        </div>
-
-        <div class="summary">
-            <h2>OpenAI Summary</h2>
+        {% if analysis %}
+        <div class="section">
+            <h2>Summary</h2>
             <p>{{ analysis }}</p>
         </div>
+        {% endif %}
+
+        {% if metrics %}
+        <div class="section">
+            <h2>Metrics</h2>
+            <p>{{ metrics }}</p>
+        </div>
+        {% endif %}
 
         <a class="back-link" href="/">&#x2190; Back to Home</a>
     </div>

@@ -94,6 +94,12 @@ def enrichData(clean_chunk):
             }
             response = requests.get("https://www.googleapis.com/youtube/v3/videos", params=params)
             enriched_video_data = response.json()
+
+            print("API Response:", enriched_video_data)
+
+            if "items" not in enriched_video_data:
+                print("Warning: YouTube API error", enriched_video_data)
+                continue 
             
             for enriched_video in enriched_video_data["items"]:
                 # temp datastore for easy access
