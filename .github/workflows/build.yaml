@@ -23,7 +23,7 @@ jobs:
               run: |
                   docker compose build
                   docker compose up -d
-                  docker compose -T web pytest
+                  docker compose exec web pytest
                   docker compose down
 
     deploy:
