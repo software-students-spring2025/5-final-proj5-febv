@@ -21,7 +21,7 @@ jobs:
         run: |
           docker compose build
           docker compose up -d
-          docker compose exec openai pytest
+          docker compose exec open-ai pytest
           docker compose down
 
   deploy:
@@ -31,6 +31,12 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker tag open-ai_openai ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest
 
       - name: Deploy to Droplet
         uses: appleboy/ssh-action@master
