@@ -27,7 +27,7 @@ jobs:
 
     deploy:
         needs: test-web-app
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         runs-on: ubuntu-latest
         timeout-minutes: 15
         steps:
