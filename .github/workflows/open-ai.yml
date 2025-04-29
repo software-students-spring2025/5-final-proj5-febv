@@ -13,9 +13,10 @@ jobs:
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v3
 
-            - name: Create .env from secrets
+            - name: Create .env file
               run: |
-                  echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+                  echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
+                  echo "MONGO_URI=mongodb://mongodb:27017" >> .env
 
             - name: Build and test with Docker Compose
               run: |
@@ -32,10 +33,16 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Push Docker image to Docker Hub
+            - name: Create .env file
               run: |
-                  docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-                  docker tag open-ai_openai ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest
+                  echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
+                  echo "MONGO_URI=mongodb://mongodb:27017" >> .env
+
+            - name: Build and push Docker image
+              run: |
+                  echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+                  docker compose build open-ai
+                  docker tag 5-final-proj5-febv-open-ai ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest
                   docker push ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest
 
             - name: Deploy to Droplet
@@ -45,17 +52,21 @@ jobs:
                   username: root
                   password: ${{ secrets.DROPLET_PASSWORD }}
                   script: |
-                      # Navigate to project directory
-                      cd /home/swe/5-final-proj5-febv
+                      # Login to Docker Hub
+                      echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-                      # Pull latest code
-                      git pull origin main
+                      # Create .env file
+                      echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
+                      echo "MONGO_URI=mongodb://mongodb:27017" >> .env
 
                       # Stop and remove existing containers
                       docker compose down
 
-                      # Build and start new containers
-                      docker compose up -d --build
+                      # Pull the latest open-ai image
+                      docker pull ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest
+
+                      # Start the containers
+                      docker compose up -d
 
                       # Clean up unused images
                       docker image prune -f

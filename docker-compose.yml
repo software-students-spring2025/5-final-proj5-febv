@@ -6,6 +6,8 @@ services:
         depends_on:
             - mongodb
             - open-ai
+        env_file:
+            - .env
         environment:
             - FLASK_ENV=development
             - OPENAI_SERVICE_URL=http://open-ai:8000
