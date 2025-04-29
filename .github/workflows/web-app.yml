@@ -2,7 +2,7 @@ name: Web App CI
 on:
     pull_request:
     push:
-        branches: [main]
+        branches: [main, fix-ci-cd]
 
 jobs:
     test-web-app:
