@@ -112,6 +112,13 @@ jobs:
                       docker stop web || true
                       docker rm -f web || true
 
+                      # Check if MongoDB is running and stop it if needed
+                      if docker ps -q -f name=mongodb; then
+                          # If MongoDB is running, stop it and remove it
+                          docker stop mongodb || true
+                          docker rm -f mongodb || true
+                      fi
+
                       # Pull the latest web-app image
                       docker pull ${{ secrets.DOCKERHUB_USERNAME }}/web-app:latest
 

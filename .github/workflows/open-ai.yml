@@ -103,6 +103,13 @@ jobs:
                       docker stop open-ai || true
                       docker rm -f open-ai || true
 
+                      # Check if MongoDB is running and stop it if needed
+                      if docker ps -q -f name=mongodb; then
+                          # If MongoDB is running, stop it and remove it
+                          docker stop mongodb || true
+                          docker rm -f mongodb || true
+                      fi
+
                       # Pull the latest open-ai image
                       docker pull ${{ secrets.DOCKERHUB_USERNAME }}/open-ai:latest
 
