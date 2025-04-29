@@ -7,9 +7,6 @@ on:
 jobs:
   test-web-app:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: web-app
     steps:
       - uses: actions/checkout@v4
 

@@ -7,9 +7,6 @@ on:
 jobs:
   test-open-ai:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: open-ai
     steps:
       - uses: actions/checkout@v4
 
