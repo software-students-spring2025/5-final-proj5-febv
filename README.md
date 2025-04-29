@@ -1,3 +1,6 @@
+![Web App CI/CD](https://github.com/software-students-spring2025/5-final-proj5-febv/actions/workflows/web-app.yml/badge.svg?branch=)
+![OpenAI CI/CD](https://github.com/software-students-spring2025/5-final-proj5-febv/actions/workflows/open-ai.yml/badge.svg?branch=)
+
 # YouTube Watch History Analyzer
 
 This project allows users to upload their YouTube watch history and recieved a synthesized analysis of their viewing habits. 
